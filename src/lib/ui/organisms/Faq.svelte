@@ -61,7 +61,7 @@
 <style lang="scss">
 	.faq {
 		max-width: 800px;
-		margin: 0 auto;
+		margin: var(--space-xxl) auto;
 		.faq-list {
 		}
 		.faq-item {
