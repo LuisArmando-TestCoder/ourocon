@@ -6,6 +6,7 @@
 	import { browser } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { getSmoother, refreshAll } from '$lib/anim/gsap.client';
+	import Faq from '$lib/ui/organisms/Faq.svelte';
 
 	// --- State ---
 	let showAnnouncement = true;
@@ -35,8 +36,8 @@
 	afterNavigate(({ to }) => {
 		if (browser) {
 			const smoother = getSmoother();
-			if (smoother && to?.hash) {
-				smoother.scrollTo(to.hash, true, 'top top');
+			if (smoother && to?.url.hash) {
+				smoother.scrollTo(to.url.hash, true, 'top top');
 			} else if (smoother) {
 				smoother.scrollTo(0, true);
 			}
@@ -47,19 +48,6 @@
 	function handleDismissAnnouncement() {
 		showAnnouncement = false;
 		localStorage.setItem('announcementDismissed', 'true');
-	}
-
-	function handleFaqToggle(e: MouseEvent) {
-		const button = e.currentTarget as HTMLButtonElement;
-		const content = button.nextElementSibling as HTMLElement;
-		const isExpanded = button.getAttribute('aria-expanded') === 'true';
-
-		button.setAttribute('aria-expanded', String(!isExpanded));
-		if (!isExpanded) {
-			content.style.maxHeight = content.scrollHeight + 'px';
-		} else {
-			content.style.maxHeight = '0px';
-		}
 	}
 </script>
 
@@ -117,42 +105,13 @@
 						on:keydown={(e) => e.key === 'Escape' && handleDismissAnnouncement()}
 					>
 						&times;
-					</button>
-				</div>
-			{/if}
+			</button>
+		</div>
+	{/if}
 
-			<!-- 2. Header -->
-			<header class="page-header">
-				<div class="container">
-					<a href="/" class="logo" aria-label="Homepage">
-						<!-- Placeholder SVG Logo -->
-						<svg
-							width="40"
-							height="40"
-							viewBox="0 0 100 100"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							><rect width="100" height="100" rx="20" fill="currentColor" /></svg
-						>
-						<span>{$content.organization.name}</span>
-					</a>
-					<nav aria-label="Primary">
-						<ul>
-							<li><a href="#features">Features</a></li>
-							<li><a href="#pricing">Pricing</a></li>
-							<li><a href="#faq">FAQ</a></li>
-						</ul>
-					</nav>
-					<div class="header-actions">
-						<a href="/login" class="cta-secondary">Log In</a>
-						<a href="/signup" class="cta-primary">Get Started</a>
-					</div>
-				</div>
-			</header>
-
-			<main id="main-content">
-				<!-- 3. Hero Section -->
-				<section class="hero" use:useScrollSection>
+	<main id="main-content">
+		<!-- 3. Hero Section -->
+		<section class="hero" use:useScrollSection>
 					<div class="container">
 						<h1 class="hero-hook" data-speed="0.9">{$content.hero.hook}</h1>
 						<p class="hero-sub-hook" data-speed="0.8">{$content.hero.subHook}</p>
@@ -344,31 +303,7 @@
 				</section>
 
 				<!-- 13. FAQ -->
-				<section id="faq" class="faq" use:useScrollSection>
-					<div class="container">
-						<div class="section-header">
-							<h2>Frequently Asked Questions</h2>
-						</div>
-						<div class="faq-list">
-							{#each $content.faq as item, i}
-								<div class="faq-item">
-									<button
-										class="faq-question"
-										aria-expanded="false"
-										aria-controls="faq-answer-{i}"
-										on:click={handleFaqToggle}
-									>
-										<span>{item.q}</span>
-										<span class="faq-icon">+</span>
-									</button>
-									<div id="faq-answer-{i}" class="faq-answer" role="region">
-										<p>{item.a}</p>
-									</div>
-								</div>
-							{/each}
-						</div>
-					</div>
-				</section>
+				<Faq />
 
 				<!-- 14. Final CTA -->
 				<section id="demo" class="final-cta" use:useScrollSection>
@@ -422,6 +357,7 @@
 </div>
 
 <style lang="scss">
+  @use '../styles/global.scss';
 	* {
 		box-sizing: border-box;
 	}
@@ -436,78 +372,6 @@
 		}
 		to {
 			opacity: 1;
-		}
-	}
-	
-	/* --- TOKENS (CSS Custom Properties) --- */
-	:global(:root) {
-		--c-primary: #007bff;
-		--c-primary-dark: #0056b3;
-		--c-secondary: #6c757d;
-		--c-text: #212529;
-		--c-text-light: #495057;
-		--c-bg: #ffffff;
-		--c-bg-alt: #f8f9fa;
-		--c-border: #dee2e6;
-		--c-white: #fff;
-		--c-focus-ring: rgba(0, 123, 255, 0.5);
-
-		--font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-		--font-serif: 'Georgia', serif;
-
-		--space-xs: 0.25rem; // 4px
-		--space-sm: 0.5rem; // 8px
-		--space-md: 1rem; // 16px
-		--space-lg: 2rem; // 32px
-		--space-xl: 4rem; // 64px
-		--space-xxl: 8rem; // 128px
-
-		--radius-sm: 0.25rem;
-		--radius-md: 0.5rem;
-		--radius-lg: 1rem;
-
-		--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
-		--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.05);
-		--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.07), 0 4px 6px rgba(0, 0, 0, 0.06);
-
-		--transition-fast: 200ms ease-in-out;
-		--transition-normal: 300ms ease-in-out;
-	}
-
-	/* --- GLOBAL STYLES & RESETS --- */
-	:global(body) {
-		margin: 0;
-		font-family: var(--font-sans);
-		color: var(--c-text);
-		background-color: var(--c-bg);
-		line-height: 1.6;
-		-webkit-font-smoothing: antialiased;
-		-moz-osx-font-smoothing: grayscale;
-	}
-
-	:global(h1, h2, h3, h4) {
-		font-weight: 700;
-		line-height: 1.2;
-		margin-top: 0;
-		margin-bottom: var(--space-md);
-	}
-	:global(h1) { font-size: clamp(2.5rem, 5vw, 3.5rem); }
-	:global(h2) { font-size: clamp(2rem, 4vw, 2.75rem); }
-	:global(h3) { font-size: 1.5rem; }
-	:global(h4) { font-size: 1.2rem; }
-
-	:global(p) {
-		margin-top: 0;
-		margin-bottom: var(--space-md);
-	}
-
-	:global(a) {
-		color: var(--c-primary);
-		text-decoration: none;
-		transition: color var(--transition-fast);
-		&:hover {
-			color: var(--c-primary-dark);
-			text-decoration: underline;
 		}
 	}
 
@@ -541,15 +405,10 @@
 		border-radius: var(--radius-md);
 		padding: 0.75rem 1.5rem;
 		text-align: center;
-		transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+		transition: all var(--transition-fast);
 		border: 2px solid transparent;
 		cursor: pointer;
 		
-		&:hover {
-			transform: translateY(-2px);
-			box-shadow: var(--shadow-md);
-			text-decoration: none;
-		}
 		&:focus-visible {
 			outline: 2px solid transparent;
 			outline-offset: 2px;
@@ -561,8 +420,8 @@
 		background-color: var(--c-primary);
 		color: var(--c-white);
 		&:hover {
-			background-color: var(--c-primary-dark);
-			color: var(--c-white);
+			background-color: var(--c-white);
+			color: var(--c-primary);
 		}
 	}
 
@@ -571,8 +430,7 @@
 		color: var(--c-primary);
 		border-color: var(--c-border);
 		&:hover {
-			background-color: var(--c-bg-alt);
-			color: var(--c-primary-dark);
+			border-color: var(--c-primary);
 		}
 	}
 
@@ -580,10 +438,6 @@
 		padding: 0;
 		font-weight: 600;
 		color: var(--c-primary);
-		&:hover {
-			box-shadow: none;
-			transform: none;
-		}
 	}
 
 	/* --- ATOMS: Cards --- */
@@ -594,10 +448,6 @@
 		box-shadow: var(--shadow-md);
 		transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 		height: 100%;
-		&:hover {
-			transform: translateY(-4px);
-			box-shadow: var(--shadow-lg);
-		}
 	}
 
 	/* --- ORGANISMS: Sections --- */
@@ -661,8 +511,10 @@
 			position: absolute;
 			right: var(--space-md);
 			opacity: 0.8;
+			transition: all var(--transition-fast);
 			&:hover {
-				opacity: 1;
+				background-color: var(--c-white);
+				color: var(--c-primary);
 			}
 		}
 	}
@@ -687,7 +539,6 @@
 			font-weight: 700;
 			font-size: 1.25rem;
 			color: var(--c-text);
-			&:hover { text-decoration: none; }
 			svg { color: var(--c-primary); }
 		}
 		nav {
@@ -705,10 +556,6 @@
 			a {
 				color: var(--c-text-light);
 				font-weight: 500;
-				&:hover {
-					color: var(--c-primary);
-					text-decoration: none;
-				}
 			}
 		}
 		.header-actions {
@@ -784,10 +631,6 @@
 				filter: grayscale(100%);
 				opacity: 0.7;
 				transition: var(--transition-normal);
-				&:hover {
-					filter: grayscale(0%);
-					opacity: 1;
-				}
 			}
 		}
 	}
@@ -895,9 +738,6 @@
 				height: 48px;
 				width: auto;
 				transition: transform var(--transition-fast);
-				&:hover {
-					transform: scale(1.1);
-				}
 			}
 		}
 	}
@@ -937,46 +777,6 @@
 		}
 	}
 
-	/* 13. FAQ */
-	.faq {
-		.faq-list {
-			max-width: 800px;
-			margin: 0 auto;
-		}
-		.faq-item {
-			border-bottom: 1px solid var(--c-border);
-		}
-		.faq-question {
-			width: 100%;
-			background: none;
-			border: none;
-			text-align: left;
-			padding: var(--space-lg) 0;
-			font-size: 1.2rem;
-			font-weight: 600;
-			cursor: pointer;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			gap: var(--space-md);
-			.faq-icon {
-				font-size: 1.5rem;
-				transition: transform var(--transition-fast);
-			}
-			&[aria-expanded='true'] .faq-icon {
-				transform: rotate(45deg);
-			}
-		}
-		.faq-answer {
-			max-height: 0;
-			overflow: hidden;
-			transition: max-height var(--transition-normal);
-			p {
-				padding-bottom: var(--space-lg);
-				color: var(--c-text-light);
-			}
-		}
-	}
 
 	/* 14. Final CTA */
 	.final-cta {
@@ -991,7 +791,8 @@
 			background-color: var(--c-white);
 			color: var(--c-primary);
 			&:hover {
-				background-color: var(--c-bg-alt);
+				background-color: var(--c-primary);
+				color: var(--c-white);
 			}
 		}
 	}
@@ -1004,9 +805,6 @@
 		font-size: 0.9rem;
 		a {
 			color: var(--c-bg-alt);
-			&:hover {
-				color: var(--c-white);
-			}
 		}
 		.footer-main {
 			display: grid;

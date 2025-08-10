@@ -15,7 +15,7 @@ type ScrollSectionOptions = {
 export function useScrollSection(node: HTMLElement, options: ScrollSectionOptions = {}) {
     if (!browser) return;
 
-    const { onActivate, onDeactivate, pin, snap, start = 'top bottom', end = 'bottom top' } = options;
+    const { onActivate, onDeactivate, pin, snap, start = 'top 80%', end = 'bottom top' } = options;
 
     let trigger: ScrollTrigger | null = null;
 
@@ -50,7 +50,7 @@ export function useScrollSection(node: HTMLElement, options: ScrollSectionOption
             timeline.from(node, {
                 opacity: 0,
                 y: 50,
-                duration: 1,
+                duration: 0.6,
                 ease: 'power3.out'
             });
         });
