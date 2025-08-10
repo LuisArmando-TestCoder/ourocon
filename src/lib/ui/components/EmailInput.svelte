@@ -67,12 +67,13 @@
     flex-direction: column;
     width: 100%;
     gap: .5rem;
+    margin-bottom: var(--space-md);
   }
 
   input {
     background: var(--color-background-very-opaque);
     backdrop-filter: blur(6px);
-    border: 1px solid var(--color-background);
+    border: 1px solid #0004;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-size: 1rem;

@@ -143,6 +143,7 @@
       border-radius: var(--radius-md);
       font-weight: 600;
       margin-bottom: var(--space-md);
+      border: 0 solid #000;
 
       &--google {
         border: 1.5px solid var(--c-border);
@@ -160,12 +161,14 @@
         background: var(--c-primary);
         color: var(--c-white);
         font-weight: 700;
+        transition: .1s;
 
         &:hover {
           background: var(--c-primary-dark);
           transform: translateY(-2px);
           box-shadow: var(--shadow-md);
           text-decoration: none;
+          transform: scale(1.01);
         }
       }
     }
