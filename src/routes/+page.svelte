@@ -1,165 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { content } from '$lib/content';
 
 	// --- State ---
 	let showAnnouncement = true;
 	let prefersReducedMotion = false;
-
-	// --- Content (from JSON) ---
-	// In a real app, this would be loaded from a static JSON file or an API.
-	const content = {
-		title: 'Silo Automation: Reclaim Your Time',
-		metaDescription:
-			'Automate repetitive tasks, integrate your tools, and unlock peak efficiency. Start for free and see results in minutes.',
-		ogImageUrl: 'https://example.com/og-image.png',
-		canonicalUrl: 'https://example.com/',
-		organization: {
-			name: 'Silo Automation, Inc.',
-			logo: 'https://example.com/logo.png',
-			url: 'https://example.com/'
-		},
-		product: {
-			name: 'Silo Automator',
-			description: 'The ultimate platform for streamlining your digital workflows.'
-		},
-		announcement: {
-			text: 'New Integration: Connect with XYZ Platform in one click!',
-			cta: 'Learn More'
-		},
-		hero: {
-			hook: 'Stop Wasting Time on Repetitive Tasks.',
-			subHook: 'Our platform automates your workflows so you can focus on what truly matters.',
-			primaryCta: 'Get Started for Free',
-			secondaryCta: 'Watch a Demo',
-			trustCues: ['No credit card required', '14-day free trial', 'Cancel anytime']
-		},
-		socialProof: {
-			logos: [
-				{ name: 'InnovateCorp', src: '/logos/innovatecorp.svg' },
-				{ name: 'QuantumLeap', src: '/logos/quantumleap.svg' },
-				{ name: 'Synergy Inc.', src: '/logos/synergy.svg' },
-				{ name: 'Apex Solutions', src: '/logos/apex.svg' },
-				{ name: 'Momentum Co.', src: '/logos/momentum.svg' }
-			],
-			counts: 'Trusted by 10,000+ teams worldwide'
-		},
-		valueProps: [
-			{ title: 'Integrate Everything', description: 'Connect all your tools in a single, unified hub.' },
-			{ title: 'Automate Workflows', description: 'Build powerful automations with a simple drag-and-drop interface.' },
-			{ title: 'Gain Full Visibility', description: 'Track every process with real-time analytics and dashboards.' },
-			{ title: 'Scale with Confidence', description: 'Our enterprise-grade platform grows with your business needs.' }
-		],
-		features: [
-			{
-				title: 'Visual Workflow Builder',
-				description: 'Design complex automations without writing a single line of code.',
-				image: '/screenshots/feature-builder.png'
-			},
-			{
-				title: 'One-Click Integrations',
-				description: 'Connect to hundreds of popular apps from our extensive library.',
-				image: '/screenshots/feature-integrations.png'
-			},
-			{
-				title: 'Advanced Analytics',
-				description: 'Get deep insights into your operational efficiency and identify bottlenecks.',
-				image: '/screenshots/feature-analytics.png'
-			}
-		],
-		howItWorks: [
-			{
-				step: 1,
-				title: 'Connect Your Apps',
-				description: 'Authorize your favorite tools with our secure, one-click process.'
-			},
-			{
-				step: 2,
-				title: 'Build Your Silo',
-				description: 'Visually map out your process using our intuitive drag-and-drop editor.'
-			},
-			{
-				step: 3,
-				title: 'Activate & Monitor',
-				description: 'Go live and watch your automated workflows deliver results in real-time.'
-			}
-		],
-		personas: [
-			{
-				persona: 'For Marketing Teams',
-				problem: 'Struggling to sync lead data between your CRM and email platform?',
-				outcome: 'Automate lead nurturing and track campaign ROI from a single dashboard.'
-			},
-			{
-				persona: 'For Operations',
-				problem: 'Manual data entry and report generation slowing you down?',
-				outcome: 'Eliminate errors and get real-time reports delivered to your inbox automatically.'
-			},
-			{
-				persona: 'For Developers',
-				problem: 'Spending too much time on internal tool scripts and API glue code?',
-				outcome: 'Offload maintenance to us and trigger workflows via our robust developer API.'
-			}
-		],
-		metrics: [
-			{ value: '50%', label: 'Reduction in manual data entry', proof: 'According to a case study with Acme Corp.' },
-			{ value: '8h', label: 'Average time saved per employee per week', proof: 'Based on internal customer surveys.' },
-			{ value: '3x', label: 'Faster project delivery cycles', proof: 'Observed in teams after 30 days of use.' }
-		],
-		integrations: {
-			text: 'Works with the tools you already love.',
-			logos: [
-				{ name: 'Tool A', src: '/logos/tool-a.svg' },
-				{ name: 'Tool B', src: '/logos/tool-b.svg' },
-				{ name: 'Tool C', src: '/logos/tool-c.svg' },
-				{ name: 'Tool D', src: '/logos/tool-d.svg' },
-				{ name: 'Tool E', src: '/logos/tool-e.svg' },
-				{ name: 'Tool F', src: '/logos/tool-f.svg' }
-			]
-		},
-		testimonials: [
-			{
-				quote: "This platform transformed our operations. We're saving hundreds of hours a month.",
-				name: 'Jane Doe',
-				title: 'COO, InnovateCorp'
-			},
-			{
-				quote: 'The flexibility of the workflow builder is unmatched. If you can think it, you can automate it.',
-				name: 'John Smith',
-				title: 'Head of Marketing, QuantumLeap'
-			},
-			{
-				quote: 'A game-changer for our dev team. We retired a mountain of legacy scripts in the first week.',
-				name: 'Emily White',
-				title: 'Lead Engineer, Synergy Inc.'
-			}
-		],
-		pricing: {
-			teaser: 'Simple, transparent pricing',
-			plan: 'Starts from $49/mo',
-			cta: 'View All Plans'
-		},
-		faq: [
-			{ q: 'Is there a free trial?', a: 'Yes! All new users get a 14-day free trial of our Pro plan, no credit card required.' },
-			{ q: 'What happens after my trial ends?', a: 'You can choose to upgrade to a paid plan or be automatically downgraded to our Free plan, which has limited features.' },
-			{ q: 'Can I integrate with custom tools?', a: 'Absolutely. Our platform includes a powerful API and webhook system to connect with any in-house or proprietary software.' },
-			{ q: 'Is my data secure?', a: 'Security is our top priority. We are SOC 2 Type II certified and all data is encrypted in transit and at rest.' },
-			{ q: 'Do you offer support?', a: 'Yes, we offer 24/7 email support on all plans, with dedicated phone and Slack support available on our Enterprise plan.' },
-			{ q: 'Can I cancel at any time?', a: 'Yes, you can cancel your subscription at any time from your account dashboard. Your plan will remain active until the end of the current billing cycle.' }
-		],
-		finalCta: {
-			hook: 'Ready to build your automated future?',
-			cta: 'Start Automating Now'
-		},
-		footer: {
-			copyright: `© ${new Date().getFullYear()} Silo Automation, Inc. All rights reserved.`,
-			links: [
-				{ text: 'Privacy Policy', href: '/legal/privacy' },
-				{ text: 'Terms of Service', href: '/legal/terms' },
-				{ text: 'Cookie Policy', href: '/legal/cookies' }
-			],
-			contact: 'support@silo-automation.com'
-		}
-	};
 
 	// --- Lifecycle & Interactions ---
 	onMount(() => {
@@ -194,34 +39,34 @@
 </script>
 
 <svelte:head>
-	<title>{content.title}</title>
-	<meta name="description" content={content.metaDescription} />
-	<link rel="canonical" href={content.canonicalUrl} />
+	<title>{$content.title}</title>
+	<meta name="description" content={$content.metaDescription} />
+	<link rel="canonical" href={$content.canonicalUrl} />
 	<!-- Open Graph -->
-	<meta property="og:title" content={content.title} />
-	<meta property="og:description" content={content.metaDescription} />
-	<meta property="og:image" content={content.ogImageUrl} />
-	<meta property="og:url" content={content.canonicalUrl} />
+	<meta property="og:title" content={$content.title} />
+	<meta property="og:description" content={$content.metaDescription} />
+	<meta property="og:image" content={$content.ogImageUrl} />
+	<meta property="og:url" content={$content.canonicalUrl} />
 	<meta property="og:type" content="website" />
 	<!-- JSON-LD -->
 	<script type="application/ld+json">
 		{
 		  "@context": "https://schema.org",
 		  "@type": "Organization",
-		  "name": "${content.organization.name}",
-		  "url": "${content.organization.url}",
-		  "logo": "${content.organization.logo}"
+		  "name": "${$content.organization.name}",
+		  "url": "${$content.organization.url}",
+		  "logo": "${$content.organization.logo}"
 		}
 	</script>
 	<script type="application/ld+json">
 		{
 		  "@context": "https://schema.org",
 		  "@type": "Product",
-		  "name": "${content.product.name}",
-		  "description": "${content.product.description}",
+		  "name": "${$content.product.name}",
+		  "description": "${$content.product.description}",
 		  "brand": {
 			"@type": "Organization",
-			"name": "${content.organization.name}"
+			"name": "${$content.organization.name}"
 		  }
 		}
 	</script>
@@ -236,8 +81,8 @@
 	{#if showAnnouncement}
 		<div class="announcement-bar">
 			<p>
-				{content.announcement.text}
-				<a href="#">{content.announcement.cta} &rarr;</a>
+				{$content.announcement.text}
+				<a href="#">{$content.announcement.cta} &rarr;</a>
 			</p>
 			<button
 				aria-label="Dismiss announcement"
@@ -255,7 +100,7 @@
 			<a href="/" class="logo" aria-label="Homepage">
 				<!-- Placeholder SVG Logo -->
 				<svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="currentColor"/></svg>
-				<span>{content.organization.name}</span>
+				<span>{$content.organization.name}</span>
 			</a>
 			<nav aria-label="Primary">
 				<ul>
@@ -275,14 +120,14 @@
 		<!-- 3. Hero Section -->
 		<section class="hero">
 			<div class="container">
-				<h1 class="hero-hook">{content.hero.hook}</h1>
-				<p class="hero-sub-hook">{content.hero.subHook}</p>
+				<h1 class="hero-hook">{$content.hero.hook}</h1>
+				<p class="hero-sub-hook">{$content.hero.subHook}</p>
 				<div class="hero-ctas">
-					<a href="/signup" class="cta-primary">{content.hero.primaryCta}</a>
-					<a href="#demo" class="cta-secondary">{content.hero.secondaryCta}</a>
+					<a href="/signup" class="cta-primary">{$content.hero.primaryCta}</a>
+					<a href="#demo" class="cta-secondary">{$content.hero.secondaryCta}</a>
 				</div>
 				<ul class="hero-trust-cues">
-					{#each content.hero.trustCues as cue}
+					{#each $content.hero.trustCues as cue}
 						<li>{cue}</li>
 					{/each}
 				</ul>
@@ -292,9 +137,9 @@
 		<!-- 4. Social Proof -->
 		<section class="social-proof">
 			<div class="container">
-				<p>{content.socialProof.counts}</p>
+				<p>{$content.socialProof.counts}</p>
 				<div class="logo-strip">
-					{#each content.socialProof.logos as logo}
+					{#each $content.socialProof.logos as logo}
 						<img src={logo.src} alt="{logo.name} logo" loading="lazy" width="120" height="40" />
 					{/each}
 				</div>
@@ -309,7 +154,7 @@
 					<p>Unlock unparalleled efficiency and control.</p>
 				</div>
 				<div class="grid">
-					{#each content.valueProps as prop, i}
+					{#each $content.valueProps as prop, i}
 						<div class="card">
 							<h3>{prop.title}</h3>
 							<p>{prop.description}</p>
@@ -326,7 +171,7 @@
 					<h2>Powerful Features, Effortless Control</h2>
 					<p>Everything you need to automate and scale your business.</p>
 				</div>
-				{#each content.features as feature, i}
+				{#each $content.features as feature, i}
 					<div class="feature-item" class:reverse={i % 2 !== 0}>
 						<div class="feature-text">
 							<h3>{feature.title}</h3>
@@ -348,7 +193,7 @@
 					<h2>Get Started in 3 Simple Steps</h2>
 				</div>
 				<div class="steps-grid">
-					{#each content.howItWorks as item, i}
+					{#each $content.howItWorks as item, i}
 						<div class="step-card">
 							<div class="step-number">{item.step}</div>
 							<h4>{item.title}</h4>
@@ -367,7 +212,7 @@
 					<p>Whatever your role, Silo Automation has a solution.</p>
 				</div>
 				<div class="grid">
-					{#each content.personas as persona, i}
+					{#each $content.personas as persona, i}
 						<div class="card">
 							<h4>{persona.persona}</h4>
 							<p><strong>Problem:</strong> {persona.problem}</p>
@@ -385,7 +230,7 @@
 					<h2>Real Results, Backed by Data</h2>
 				</div>
 				<div class="metrics-grid">
-					{#each content.metrics as metric, i}
+					{#each $content.metrics as metric, i}
 						<div class="metric-item">
 							<div class="metric-value">{metric.value}</div>
 							<div class="metric-label">{metric.label}</div>
@@ -400,10 +245,10 @@
 		<section class="integrations">
 			<div class="container">
 				<div class="section-header">
-					<h2>{content.integrations.text}</h2>
+					<h2>{$content.integrations.text}</h2>
 				</div>
 				<div class="logo-strip">
-					{#each content.integrations.logos as logo}
+					{#each $content.integrations.logos as logo}
 						<img src={logo.src} alt="{logo.name} logo" loading="lazy" width="64" height="64" />
 					{/each}
 				</div>
@@ -418,7 +263,7 @@
 					<h2>What Our Customers Say</h2>
 				</div>
 				<div class="grid">
-					{#each content.testimonials as testimonial, i}
+					{#each $content.testimonials as testimonial, i}
 						<blockquote class="card">
 							<p>"{testimonial.quote}"</p>
 							<footer>
@@ -436,12 +281,12 @@
 		<section id="pricing" class="pricing-preview">
 			<div class="container">
 				<div class="section-header">
-					<h2>{content.pricing.teaser}</h2>
+					<h2>{$content.pricing.teaser}</h2>
 				</div>
 				<div class="pricing-box">
 					<p>Our plans are designed to grow with you.</p>
-					<div class="plan-price">{content.pricing.plan}</div>
-					<a href="/pricing" class="cta-primary">{content.pricing.cta}</a>
+					<div class="plan-price">{$content.pricing.plan}</div>
+					<a href="/pricing" class="cta-primary">{$content.pricing.cta}</a>
 				</div>
 			</div>
 		</section>
@@ -453,7 +298,7 @@
 					<h2>Frequently Asked Questions</h2>
 				</div>
 				<div class="faq-list">
-					{#each content.faq as item, i}
+					{#each $content.faq as item, i}
 						<div class="faq-item">
 							<button
 								class="faq-question"
@@ -476,8 +321,8 @@
 		<!-- 14. Final CTA -->
 		<section id="demo" class="final-cta">
 			<div class="container">
-				<h2>{content.finalCta.hook}</h2>
-				<a href="/signup" class="cta-primary">{content.finalCta.cta}</a>
+				<h2>{$content.finalCta.hook}</h2>
+				<a href="/signup" class="cta-primary">{$content.finalCta.cta}</a>
 			</div>
 		</section>
 	</main>
@@ -489,10 +334,10 @@
 				<div class="footer-about">
 					<a href="/" class="logo" aria-label="Homepage">
 						<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="currentColor"/></svg>
-						<span>{content.organization.name}</span>
+						<span>{$content.organization.name}</span>
 					</a>
-					<p>&copy; {new Date().getFullYear()} {content.footer.copyright}</p>
-					<p><a href="mailto:{content.footer.contact}">{content.footer.contact}</a></p>
+					<p>&copy; {new Date().getFullYear()} {$content.footer.copyright}</p>
+					<p><a href="mailto:{$content.footer.contact}">{$content.footer.contact}</a></p>
 				</div>
 				<div class="footer-links">
 					<h4>Company</h4>
@@ -505,7 +350,7 @@
 				<div class="footer-links">
 					<h4>Legal</h4>
 					<ul>
-						{#each content.footer.links as link}
+						{#each $content.footer.links as link}
 							<li><a href={link.href}>{link.text}</a></li>
 						{/each}
 					</ul>
@@ -516,6 +361,10 @@
 </div>
 
 <style lang="scss">
+	* {
+		box-sizing: border-box;
+	}
+
 	.landing-page {
 		animation: fadeIn 0.8s ease-in-out forwards;
 	}
