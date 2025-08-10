@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { content } from '$lib/content';
+	import { useSmoothPage } from '$lib/anim/useSmoothPage';
+	import { useScrollSection } from '$lib/anim/useScrollSection';
+	import { browser } from '$app/environment';
+	import { afterNavigate } from '$app/navigation';
+	import { getSmoother, refreshAll } from '$lib/anim/gsap.client';
 
 	// --- State ---
 	let showAnnouncement = true;
@@ -8,6 +13,7 @@
 
 	// --- Lifecycle & Interactions ---
 	onMount(() => {
+		if (!browser) return;
 		// Check for reduced motion preference
 		const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 		prefersReducedMotion = mediaQuery.matches;
@@ -16,6 +22,25 @@
 		// Handle announcement bar persistence
 		if (localStorage.getItem('announcementDismissed') === 'true') {
 			showAnnouncement = false;
+		}
+
+		// Refresh ScrollTrigger on window resize
+		window.addEventListener('resize', refreshAll);
+
+		return () => {
+			window.removeEventListener('resize', refreshAll);
+		};
+	});
+
+	afterNavigate(({ to }) => {
+		if (browser) {
+			const smoother = getSmoother();
+			if (smoother && to?.hash) {
+				smoother.scrollTo(to.hash, true, 'top top');
+			} else if (smoother) {
+				smoother.scrollTo(0, true);
+			}
+			refreshAll();
 		}
 	});
 
@@ -72,292 +97,328 @@
 	</script>
 </svelte:head>
 
-<!-- Accessibility: Skip to main content -->
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<div id="smooth-wrapper" use:useSmoothPage>
+	<div id="smooth-content">
+		<!-- Accessibility: Skip to main content -->
+		<a href="#main-content" class="skip-link">Skip to main content</a>
 
-<!-- Page Wrapper -->
-<div class="landing-page">
-	<!-- 1. Announcement Bar -->
-	{#if showAnnouncement}
-		<div class="announcement-bar">
-			<p>
-				{$content.announcement.text}
-				<a href="#">{$content.announcement.cta} &rarr;</a>
-			</p>
-			<button
-				aria-label="Dismiss announcement"
-				on:click={handleDismissAnnouncement}
-				on:keydown={(e) => e.key === 'Escape' && handleDismissAnnouncement()}
-			>
-				&times;
-			</button>
-		</div>
-	{/if}
+		<!-- Page Wrapper -->
+		<div class="landing-page">
+			<!-- 1. Announcement Bar -->
+			{#if showAnnouncement}
+				<div class="announcement-bar">
+					<p>
+						{$content.announcement.text}
+						<a href="#">{$content.announcement.cta} &rarr;</a>
+					</p>
+					<button
+						aria-label="Dismiss announcement"
+						on:click={handleDismissAnnouncement}
+						on:keydown={(e) => e.key === 'Escape' && handleDismissAnnouncement()}
+					>
+						&times;
+					</button>
+				</div>
+			{/if}
 
-	<!-- 2. Header -->
-	<header class="page-header">
-		<div class="container">
-			<a href="/" class="logo" aria-label="Homepage">
-				<!-- Placeholder SVG Logo -->
-				<svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="currentColor"/></svg>
-				<span>{$content.organization.name}</span>
-			</a>
-			<nav aria-label="Primary">
-				<ul>
-					<li><a href="#features">Features</a></li>
-					<li><a href="#pricing">Pricing</a></li>
-					<li><a href="#faq">FAQ</a></li>
-				</ul>
-			</nav>
-			<div class="header-actions">
-				<a href="/login" class="cta-secondary">Log In</a>
-				<a href="/signup" class="cta-primary">Get Started</a>
-			</div>
-		</div>
-	</header>
-
-	<main id="main-content">
-		<!-- 3. Hero Section -->
-		<section class="hero">
-			<div class="container">
-				<h1 class="hero-hook">{$content.hero.hook}</h1>
-				<p class="hero-sub-hook">{$content.hero.subHook}</p>
-				<div class="hero-ctas">
-					<a href="/signup" class="cta-primary">{$content.hero.primaryCta}</a>
-					<a href="#demo" class="cta-secondary">{$content.hero.secondaryCta}</a>
-				</div>
-				<ul class="hero-trust-cues">
-					{#each $content.hero.trustCues as cue}
-						<li>{cue}</li>
-					{/each}
-				</ul>
-			</div>
-		</section>
-
-		<!-- 4. Social Proof -->
-		<section class="social-proof">
-			<div class="container">
-				<p>{$content.socialProof.counts}</p>
-				<div class="logo-strip">
-					{#each $content.socialProof.logos as logo}
-						<img src={logo.src} alt="{logo.name} logo" loading="lazy" width="120" height="40" />
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 5. Value Propositions -->
-		<section class="value-props">
-			<div class="container">
-				<div class="section-header">
-					<h2>Why Choose Us?</h2>
-					<p>Unlock unparalleled efficiency and control.</p>
-				</div>
-				<div class="grid">
-					{#each $content.valueProps as prop, i}
-						<div class="card">
-							<h3>{prop.title}</h3>
-							<p>{prop.description}</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 6. Feature Grid -->
-		<section id="features" class="feature-grid">
-			<div class="container">
-				<div class="section-header">
-					<h2>Powerful Features, Effortless Control</h2>
-					<p>Everything you need to automate and scale your business.</p>
-				</div>
-				{#each $content.features as feature, i}
-					<div class="feature-item" class:reverse={i % 2 !== 0}>
-						<div class="feature-text">
-							<h3>{feature.title}</h3>
-							<p>{feature.description}</p>
-							<a href="#" class="cta-link">Learn more &rarr;</a>
-						</div>
-						<div class="feature-visual">
-							<img src={feature.image} alt="{feature.title} screenshot" loading="lazy" width="500" height="350" />
-						</div>
-					</div>
-				{/each}
-			</div>
-		</section>
-
-		<!-- 7. How It Works -->
-		<section class="how-it-works">
-			<div class="container">
-				<div class="section-header">
-					<h2>Get Started in 3 Simple Steps</h2>
-				</div>
-				<div class="steps-grid">
-					{#each $content.howItWorks as item, i}
-						<div class="step-card">
-							<div class="step-number">{item.step}</div>
-							<h4>{item.title}</h4>
-							<p>{item.description}</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 8. Use Cases / Personas -->
-		<section class="personas">
-			<div class="container">
-				<div class="section-header">
-					<h2>Built for Every Team</h2>
-					<p>Whatever your role, Silo Automation has a solution.</p>
-				</div>
-				<div class="grid">
-					{#each $content.personas as persona, i}
-						<div class="card">
-							<h4>{persona.persona}</h4>
-							<p><strong>Problem:</strong> {persona.problem}</p>
-							<p><strong>Outcome:</strong> {persona.outcome}</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 9. Metrics / Outcomes -->
-		<section class="metrics">
-			<div class="container">
-				<div class="section-header">
-					<h2>Real Results, Backed by Data</h2>
-				</div>
-				<div class="metrics-grid">
-					{#each $content.metrics as metric, i}
-						<div class="metric-item">
-							<div class="metric-value">{metric.value}</div>
-							<div class="metric-label">{metric.label}</div>
-							<p class="metric-proof">{metric.proof}</p>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 10. Integrations -->
-		<section class="integrations">
-			<div class="container">
-				<div class="section-header">
-					<h2>{$content.integrations.text}</h2>
-				</div>
-				<div class="logo-strip">
-					{#each $content.integrations.logos as logo}
-						<img src={logo.src} alt="{logo.name} logo" loading="lazy" width="64" height="64" />
-					{/each}
-				</div>
-				<a href="/integrations" class="cta-link">See all integrations &rarr;</a>
-			</div>
-		</section>
-
-		<!-- 11. Testimonials -->
-		<section class="testimonials">
-			<div class="container">
-				<div class="section-header">
-					<h2>What Our Customers Say</h2>
-				</div>
-				<div class="grid">
-					{#each $content.testimonials as testimonial, i}
-						<blockquote class="card">
-							<p>"{testimonial.quote}"</p>
-							<footer>
-								<cite>
-									<strong>{testimonial.name}</strong>, {testimonial.title}
-								</cite>
-							</footer>
-						</blockquote>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 12. Pricing Preview -->
-		<section id="pricing" class="pricing-preview">
-			<div class="container">
-				<div class="section-header">
-					<h2>{$content.pricing.teaser}</h2>
-				</div>
-				<div class="pricing-box">
-					<p>Our plans are designed to grow with you.</p>
-					<div class="plan-price">{$content.pricing.plan}</div>
-					<a href="/pricing" class="cta-primary">{$content.pricing.cta}</a>
-				</div>
-			</div>
-		</section>
-
-		<!-- 13. FAQ -->
-		<section id="faq" class="faq">
-			<div class="container">
-				<div class="section-header">
-					<h2>Frequently Asked Questions</h2>
-				</div>
-				<div class="faq-list">
-					{#each $content.faq as item, i}
-						<div class="faq-item">
-							<button
-								class="faq-question"
-								aria-expanded="false"
-								aria-controls="faq-answer-{i}"
-								on:click={handleFaqToggle}
-							>
-								<span>{item.q}</span>
-								<span class="faq-icon">+</span>
-							</button>
-							<div id="faq-answer-{i}" class="faq-answer" role="region">
-								<p>{item.a}</p>
-							</div>
-						</div>
-					{/each}
-				</div>
-			</div>
-		</section>
-
-		<!-- 14. Final CTA -->
-		<section id="demo" class="final-cta">
-			<div class="container">
-				<h2>{$content.finalCta.hook}</h2>
-				<a href="/signup" class="cta-primary">{$content.finalCta.cta}</a>
-			</div>
-		</section>
-	</main>
-
-	<!-- 15. Footer -->
-	<footer class="page-footer">
-		<div class="container">
-			<div class="footer-main">
-				<div class="footer-about">
+			<!-- 2. Header -->
+			<header class="page-header">
+				<div class="container">
 					<a href="/" class="logo" aria-label="Homepage">
-						<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="currentColor"/></svg>
+						<!-- Placeholder SVG Logo -->
+						<svg
+							width="40"
+							height="40"
+							viewBox="0 0 100 100"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							><rect width="100" height="100" rx="20" fill="currentColor" /></svg
+						>
 						<span>{$content.organization.name}</span>
 					</a>
-					<p>&copy; {new Date().getFullYear()} {$content.footer.copyright}</p>
-					<p><a href="mailto:{$content.footer.contact}">{$content.footer.contact}</a></p>
+					<nav aria-label="Primary">
+						<ul>
+							<li><a href="#features">Features</a></li>
+							<li><a href="#pricing">Pricing</a></li>
+							<li><a href="#faq">FAQ</a></li>
+						</ul>
+					</nav>
+					<div class="header-actions">
+						<a href="/login" class="cta-secondary">Log In</a>
+						<a href="/signup" class="cta-primary">Get Started</a>
+					</div>
 				</div>
-				<div class="footer-links">
-					<h4>Company</h4>
-					<ul>
-						<li><a href="/about">About Us</a></li>
-						<li><a href="/careers">Careers</a></li>
-						<li><a href="/blog">Blog</a></li>
-					</ul>
-				</div>
-				<div class="footer-links">
-					<h4>Legal</h4>
-					<ul>
-						{#each $content.footer.links as link}
-							<li><a href={link.href}>{link.text}</a></li>
+			</header>
+
+			<main id="main-content">
+				<!-- 3. Hero Section -->
+				<section class="hero" use:useScrollSection>
+					<div class="container">
+						<h1 class="hero-hook" data-speed="0.9">{$content.hero.hook}</h1>
+						<p class="hero-sub-hook" data-speed="0.8">{$content.hero.subHook}</p>
+						<div class="hero-ctas" data-speed="0.9">
+							<a href="/signup" class="cta-primary">{$content.hero.primaryCta}</a>
+							<a href="#demo" class="cta-secondary">{$content.hero.secondaryCta}</a>
+						</div>
+						<ul class="hero-trust-cues" data-speed="0.7">
+							{#each $content.hero.trustCues as cue}
+								<li>{cue}</li>
+							{/each}
+						</ul>
+					</div>
+				</section>
+
+				<!-- 4. Social Proof -->
+				<section class="social-proof" use:useScrollSection>
+					<div class="container">
+						<p>{$content.socialProof.counts}</p>
+						<div class="logo-strip" data-speed="1.1">
+							{#each $content.socialProof.logos as logo}
+								<img
+									src={logo.src}
+									alt="{logo.name} logo"
+									loading="lazy"
+									width="120"
+									height="40"
+								/>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 5. Value Propositions -->
+				<section class="value-props" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Why Choose Us?</h2>
+							<p>Unlock unparalleled efficiency and control.</p>
+						</div>
+						<div class="grid">
+							{#each $content.valueProps as prop, i}
+								<div class="card" data-speed="1.05">
+									<h3>{prop.title}</h3>
+									<p>{prop.description}</p>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 6. Feature Grid -->
+				<section id="features" class="feature-grid" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Powerful Features, Effortless Control</h2>
+							<p>Everything you need to automate and scale your business.</p>
+						</div>
+						{#each $content.features as feature, i}
+							<div class="feature-item" class:reverse={i % 2 !== 0}>
+								<div class="feature-text">
+									<h3>{feature.title}</h3>
+									<p>{feature.description}</p>
+									<a href="#" class="cta-link">Learn more &rarr;</a>
+								</div>
+								<div class="feature-visual" data-speed="auto">
+									<img
+										src={feature.image}
+										alt="{feature.title} screenshot"
+										loading="lazy"
+										width="500"
+										height="350"
+									/>
+								</div>
+							</div>
 						{/each}
-					</ul>
+					</div>
+				</section>
+
+				<!-- 7. How It Works -->
+				<section class="how-it-works" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Get Started in 3 Simple Steps</h2>
+						</div>
+						<div class="steps-grid">
+							{#each $content.howItWorks as item, i}
+								<div class="step-card" data-lag="0.1">
+									<div class="step-number">{item.step}</div>
+									<h4>{item.title}</h4>
+									<p>{item.description}</p>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 8. Use Cases / Personas -->
+				<section class="personas" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Built for Every Team</h2>
+							<p>Whatever your role, Silo Automation has a solution.</p>
+						</div>
+						<div class="grid">
+							{#each $content.personas as persona, i}
+								<div class="card" data-speed="1.05">
+									<h4>{persona.persona}</h4>
+									<p><strong>Problem:</strong> {persona.problem}</p>
+									<p><strong>Outcome:</strong> {persona.outcome}</p>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 9. Metrics / Outcomes -->
+				<section class="metrics" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Real Results, Backed by Data</h2>
+						</div>
+						<div class="metrics-grid">
+							{#each $content.metrics as metric, i}
+								<div class="metric-item" data-speed="0.9">
+									<div class="metric-value">{metric.value}</div>
+									<div class="metric-label">{metric.label}</div>
+									<p class="metric-proof">{metric.proof}</p>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 10. Integrations -->
+				<section class="integrations" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>{$content.integrations.text}</h2>
+						</div>
+						<div class="logo-strip" data-speed="1.1">
+							{#each $content.integrations.logos as logo}
+								<img
+									src={logo.src}
+									alt="{logo.name} logo"
+									loading="lazy"
+									width="64"
+									height="64"
+								/>
+							{/each}
+						</div>
+						<a href="/integrations" class="cta-link">See all integrations &rarr;</a>
+					</div>
+				</section>
+
+				<!-- 11. Testimonials -->
+				<section class="testimonials" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>What Our Customers Say</h2>
+						</div>
+						<div class="grid">
+							{#each $content.testimonials as testimonial, i}
+								<blockquote class="card" data-lag="0.05">
+									<p>"{testimonial.quote}"</p>
+									<footer>
+										<cite>
+											<strong>{testimonial.name}</strong>, {testimonial.title}
+										</cite>
+									</footer>
+								</blockquote>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 12. Pricing Preview -->
+				<section id="pricing" class="pricing-preview" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>{$content.pricing.teaser}</h2>
+						</div>
+						<div class="pricing-box">
+							<p>Our plans are designed to grow with you.</p>
+							<div class="plan-price">{$content.pricing.plan}</div>
+							<a href="/pricing" class="cta-primary">{$content.pricing.cta}</a>
+						</div>
+					</div>
+				</section>
+
+				<!-- 13. FAQ -->
+				<section id="faq" class="faq" use:useScrollSection>
+					<div class="container">
+						<div class="section-header">
+							<h2>Frequently Asked Questions</h2>
+						</div>
+						<div class="faq-list">
+							{#each $content.faq as item, i}
+								<div class="faq-item">
+									<button
+										class="faq-question"
+										aria-expanded="false"
+										aria-controls="faq-answer-{i}"
+										on:click={handleFaqToggle}
+									>
+										<span>{item.q}</span>
+										<span class="faq-icon">+</span>
+									</button>
+									<div id="faq-answer-{i}" class="faq-answer" role="region">
+										<p>{item.a}</p>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+
+				<!-- 14. Final CTA -->
+				<section id="demo" class="final-cta" use:useScrollSection>
+					<div class="container">
+						<h2>{$content.finalCta.hook}</h2>
+						<a href="/signup" class="cta-primary">{$content.finalCta.cta}</a>
+					</div>
+				</section>
+			</main>
+
+			<!-- 15. Footer -->
+			<footer class="page-footer">
+				<div class="container">
+					<div class="footer-main">
+						<div class="footer-about">
+							<a href="/" class="logo" aria-label="Homepage">
+								<svg
+									width="32"
+									height="32"
+									viewBox="0 0 100 100"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+									><rect width="100" height="100" rx="20" fill="currentColor" /></svg
+								>
+								<span>{$content.organization.name}</span>
+							</a>
+							<p>&copy; {new Date().getFullYear()} {$content.footer.copyright}</p>
+							<p><a href="mailto:{$content.footer.contact}">{$content.footer.contact}</a></p>
+						</div>
+						<div class="footer-links">
+							<h4>Company</h4>
+							<ul>
+								<li><a href="/about">About Us</a></li>
+								<li><a href="/careers">Careers</a></li>
+								<li><a href="/blog">Blog</a></li>
+							</ul>
+						</div>
+						<div class="footer-links">
+							<h4>Legal</h4>
+							<ul>
+								{#each $content.footer.links as link}
+									<li><a href={link.href}>{link.text}</a></li>
+								{/each}
+							</ul>
+						</div>
+					</div>
 				</div>
-			</div>
+			</footer>
 		</div>
-	</footer>
+	</div>
 </div>
 
 <style lang="scss">
