@@ -30,7 +30,7 @@
 
   {#if user}
     <div class="sidebar__profile">
-      <img src={user.image || '/avatar.png'} alt="User avatar" class="sidebar__profile-avatar" />
+      <img src={user.image || '/icons/user.png'} alt="User avatar" class="sidebar__profile-avatar" />
       <div class="sidebar__profile-info">
         <p class="sidebar__profile-name">{user.name}</p>
         <a href="/logout" class="sidebar__profile-logout">Logout</a>

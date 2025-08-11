@@ -41,7 +41,7 @@
 <div class="auth-form">
   <div class="auth-form__card">
     <div class="auth-form__header">
-      <img src="/logo.svg" alt="logo" class="auth-form__logo" />
+      <img src="/icons/logo.png" width="175" alt="logo" class="auth-form__logo" />
       <h1 class="auth-form__title">{copy.title}</h1>
     </div>
     {#if copy.subtitle}
@@ -127,6 +127,7 @@
       line-height: 1.2;
       letter-spacing: -0.01em;
       color: var(--c-text);
+      text-align: right;
     }
 
     &__subtitle {

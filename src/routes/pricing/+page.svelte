@@ -114,6 +114,7 @@
   .pricing__grid {
     display: grid; gap: var(--space-lg);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    padding: var(--space-lg) 0;
   }
 
   /* Plan card */

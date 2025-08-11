@@ -309,7 +309,7 @@
 				<section id="demo" class="final-cta" use:useScrollSection>
 					<div class="container">
 						<h2>{$content.finalCta.hook}</h2>
-						<a href="/signup" class="cta-primary">{$content.finalCta.cta}</a>
+						<a href="/signup" class="cta-primary-inverted">{$content.finalCta.cta}</a>
 					</div>
 				</section>
 			</main>
@@ -320,14 +320,7 @@
 					<div class="footer-main">
 						<div class="footer-about">
 							<a href="/" class="logo" aria-label="Homepage">
-								<svg
-									width="32"
-									height="32"
-									viewBox="0 0 100 100"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-									><rect width="100" height="100" rx="20" fill="currentColor" /></svg
-								>
+								<img src="/icons/logo.png" width="50" alt="logo">
 								<span>{$content.organization.name}</span>
 							</a>
 							<p>&copy; {new Date().getFullYear()} {$content.footer.copyright}</p>
@@ -399,7 +392,7 @@
 	}
 
 	/* --- ATOMS: Buttons & Links --- */
-	.cta-primary, .cta-secondary, .cta-link {
+	.cta-primary, .cta-secondary, .cta-link, .cta-primary-inverted {
 		display: inline-block;
 		font-weight: 600;
 		border-radius: var(--radius-md);
@@ -417,11 +410,28 @@
 	}
 
 	.cta-primary {
-		background-color: var(--c-primary);
+		background-color: var(--c-white);
 		color: var(--c-white);
+		box-shadow: inset 0 0 0 100px var(--c-primary);
+		transition: box-shadow 1s, color .2s, background-color .4s;
+
 		&:hover {
-			background-color: var(--c-white);
+			background-color: transparent;
 			color: var(--c-primary);
+			box-shadow: inset 0 0 0 2px var(--c-primary);
+		}
+	}
+
+	.cta-primary-inverted {
+		background-color: var(--c-primary);
+		color: var(--c-primary);
+		box-shadow: inset 0 0 0 100px var(--c-white);
+		transition: box-shadow 1s, color .2s, background-color .4s;
+
+		&:hover {
+			background-color: transparent;
+			color: var(--c-white);
+			box-shadow: inset 0 0 0 2px var(--c-white);
 		}
 	}
 
@@ -814,6 +824,9 @@
 			}
 		}
 		.logo {
+			display: flex;
+			place-items: center;
+			gap: var(--space-md);
 			color: var(--c-white);
 			margin-bottom: var(--space-md);
 			svg { color: var(--c-primary); }

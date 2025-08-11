@@ -5,28 +5,38 @@
   ];
 </script>
 
-<header class="header">
-  <div class="header__container">
-    <a href="/" class="header__logo" aria-label="Homepage">
-      <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" rx="20" fill="currentColor"/></svg>
-      <span class="header__logo-text">Ourocon</span>
-    </a>
-    <nav class="header__nav" aria-label="Primary">
-      <ul class="header__nav-list">
-        {#each links as link}
-          <li class="header__nav-item"><a href={link.url} class="header__nav-link">{link.name}</a></li>
-        {/each}
-      </ul>
-    </nav>
-    <div class="header__actions">
-      <a href="/login" class="header__action header__action--secondary">Log In</a>
-      <a href="/signup" class="header__action header__action--primary">Get Started</a>
+<div class="header-wrapper">
+  <header class="header">
+    <div class="header__container">
+      <a href="/" class="header__logo" aria-label="Homepage">
+        <img src="/icons/logo.png" width="50" alt="logo">
+        <span class="header__logo-text">Ourocon</span>
+      </a>
+      <div class="header__nav-scroller">
+        <nav class="header__nav" aria-label="Primary">
+          <ul class="header__nav-list">
+            {#each links as link}
+              <li class="header__nav-item">
+                <a href={link.url} class="header__nav-link">{link.name}</a>
+              </li>
+            {/each}
+          </ul>
+        </nav>
+      </div>
+      <div class="header__actions">
+        <a href="/login" class="header__action header__action--secondary">Log In</a>
+        <a href="/signup" class="header__action header__action--primary">Get Started</a>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
+</div>
 
 <style lang="scss">
   @use '../../../styles/global.scss';
+
+  .header-wrapper {
+    container-type: inline-size;
+  }
 
   .header {
     background: var(--c-bg);
@@ -43,6 +53,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-md);
+    gap: var(--space-md);
   }
 
   .header__logo {
@@ -53,6 +64,7 @@
     font-size: 1.25rem;
     color: var(--c-text);
     text-decoration: none;
+    transition: all var(--transition-fast);
 
     &:hover {
       text-decoration: none;
@@ -60,6 +72,16 @@
 
     svg {
       color: var(--c-primary);
+      flex-shrink: 0;
+    }
+  }
+
+  .header__nav-scroller {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    &::-webkit-scrollbar {
+      display: none; /* Safari and Chrome */
     }
   }
 
@@ -75,6 +97,7 @@
     color: var(--c-text-light);
     font-weight: 500;
     text-decoration: none;
+    white-space: nowrap;
 
     &:hover {
       color: var(--c-primary);
@@ -93,6 +116,7 @@
     text-decoration: none;
     font-weight: 600;
     transition: all var(--transition-fast);
+    white-space: nowrap;
 
     &--primary {
       background-color: var(--c-primary);
@@ -111,6 +135,56 @@
       &:hover {
         border-color: var(--c-primary);
       }
+    }
+  }
+
+  /* Shape C: Expanded (Default) */
+  @container (width >= 961px) {
+    .header__nav-scroller {
+      overflow-x: visible;
+    }
+  }
+
+  /* Shape B: Condensed */
+  @container (481px < width < 961px) {
+    .header__container {
+      gap: var(--space-sm);
+    }
+    .header__logo-text {
+      font-size: 1rem;
+    }
+    .header__action--secondary {
+      @media (width < 520px) {
+        display: none;
+      }
+    }
+  }
+
+  /* Shape A: Compact */
+  @container (width <= 480px) {
+    .header__container {
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+    .header__logo-text {
+      display: none;
+    }
+    .header__nav-scroller {
+      order: 3;
+      width: 100%;
+    }
+    .header__actions {
+      margin-left: auto;
+    }
+    .header__action--secondary {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header__logo,
+    .header__action {
+      transition: none;
     }
   }
 </style>

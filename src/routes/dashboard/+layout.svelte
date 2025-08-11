@@ -16,6 +16,10 @@
     grid-template-columns: calc(250px + var(--space-md) * 2) 1fr;
     transition: grid-template-columns 0.3s ease;
 
+    &__content {
+      padding: var(--space-md) var(--space-lg);
+    }
+
     &.collapsed {
       grid-template-columns: var(--collapsed-width, calc(40px + var(--space-md) * 2)) 1fr;
     }
